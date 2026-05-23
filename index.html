@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ABC Restaurant — Premium Dining</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;0,900;1,400&family=Bricolage+Grotesque:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root {
   --black: #0A0A0A;
@@ -95,12 +94,27 @@ nav.scrolled{top:0;background:rgba(10,10,10,0.92);backdrop-filter:blur(20px);bor
 .stat-num{font-family:'Fraunces',serif;font-size:34px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;background-clip:text;color:transparent;}
 .stat-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px;}
 
-/* 3D CANVAS AREA */
-.hero-3d{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;}
+/* FOOD COLLAGE */
+.food-collage{display:flex;gap:12px;width:440px;height:440px;animation:heroImgFloat 4s ease-in-out infinite;}
+.collage-right{display:flex;flex-direction:column;gap:12px;flex:1;}
+.collage-card{position:relative;border-radius:16px;overflow:hidden;flex:1;border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.4);cursor:pointer;}
+.collage-card.tall{width:220px;flex-shrink:0;}
+.collage-card img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s cubic-bezier(0.16,1,0.3,1);filter:brightness(0.9);}
+.collage-card:hover img{transform:scale(1.08);filter:brightness(1);}
+.collage-card::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%);pointer-events:none;}
+.collage-label{position:absolute;bottom:10px;left:12px;color:white;font-size:13px;font-weight:600;z-index:2;text-shadow:0 2px 4px rgba(0,0,0,0.5);}
+.collage-card:nth-child(1){animation:colFloat1 4s ease-in-out infinite;}
+.collage-card:nth-child(2){animation:colFloat2 4s 0.5s ease-in-out infinite;}
+.collage-card:nth-child(3){animation:colFloat2 4s 1s ease-in-out infinite;}
+.collage-card:nth-child(4){animation:colFloat1 4s 1.5s ease-in-out infinite;}
+@keyframes colFloat1{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes colFloat2{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 #three-canvas{border-radius:50%;filter:drop-shadow(0 0 40px rgba(232,52,10,0.3));}
 .float-badge{position:absolute;background:rgba(20,20,20,0.95);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:13px;font-weight:500;white-space:nowrap;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
 .float-badge.top{top:10%;right:-20px;animation:floatBadge 3s ease-in-out infinite;}
 .float-badge.bot{bottom:15%;left:-20px;animation:floatBadge 3s 1.5s ease-in-out infinite;}
+@keyframes heroImgFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+@keyframes heroImgZoom{0%{transform:scale(1);}100%{transform:scale(1.08);}}
 @keyframes floatBadge{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
 
 /* WAVE DIVIDER */
@@ -350,10 +364,26 @@ footer{background:#060606;padding:50px 5% 30px;border-top:1px solid var(--border
     </div>
   </div>
   <div class="hero-3d">
-    <div style="position:relative;">
-      <canvas id="three-canvas" width="420" height="420"></canvas>
-      <div class="float-badge top">🚴 45 min delivery</div>
-      <div class="float-badge bot">✅ Halal Certified</div>
+    <div class="food-collage">
+      <!-- Top row -->
+      <div class="collage-card tall">
+        <img src="https://foodish-api.com/images/pizza/pizza1.jpg" alt="Pizza" onerror="this.src='https://foodish-api.com/images/pizza/pizza2.jpg'">
+        <div class="collage-label">🍕 Pizza</div>
+      </div>
+      <div class="collage-right">
+        <div class="collage-card">
+          <img src="https://foodish-api.com/images/burger/burger1.jpg" alt="Burger" onerror="this.src='https://foodish-api.com/images/burger/burger2.jpg'">
+          <div class="collage-label">🍔 Burger</div>
+        </div>
+        <div class="collage-card">
+          <img src="https://foodish-api.com/images/biryani/biryani1.jpg" alt="Roll" onerror="this.src='https://foodish-api.com/images/biryani/biryani2.jpg'">
+          <div class="collage-label">🌯 Roll</div>
+        </div>
+        <div class="collage-card">
+          <img src="https://foodish-api.com/images/dessert/dessert4.jpg" alt="Shake" onerror="this.src='https://foodish-api.com/images/coffee/coffee1.jpg'">
+          <div class="collage-label">🥤 Shake</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -663,18 +693,27 @@ footer{background:#060606;padding:50px 5% 30px;border-top:1px solid var(--border
 <div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 
 <script>
-// PAGE LOADER — guaranteed to hide
+// PAGE LOADER — hide instantly, no waiting
+const loader = document.getElementById('loader');
 function hideLoader(){
-  const loader=document.getElementById('loader');
-  if(loader){loader.classList.add('hide');setTimeout(()=>{loader.style.display='none';},1100);}
+  if(!loader) return;
+  loader.classList.add('hide');
+  setTimeout(()=>{loader.style.display='none';},1100);
 }
-// Hide after 1.8s max — no matter what
-setTimeout(hideLoader, 1800);
-// Also hide on load event as backup
-window.addEventListener('load', ()=>setTimeout(hideLoader, 500));
-// Also hide if user scrolls or clicks (emergency fallback)
+// Hide after max 1.5s no matter what
+setTimeout(hideLoader, 1500);
+window.addEventListener('load', ()=>setTimeout(hideLoader,100));
 document.addEventListener('click', hideLoader, {once:true});
-document.addEventListener('keydown', hideLoader, {once:true});
+
+// Load Three.js dynamically after page loads
+window.addEventListener('load', function(){
+  if(window.innerWidth < 768) return; // skip on mobile
+  var s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = init3D;
+  s.onerror = function(){}; // silently fail
+  document.head.appendChild(s);
+});
 
 // CUSTOM CURSOR
 const dot=document.getElementById('cursor-dot');
@@ -818,7 +857,8 @@ function drawParticles(){
 drawParticles();
 
 // THREE.JS 3D
-if(!isMobile&&typeof THREE!=='undefined'){
+function init3D(){
+  if(typeof THREE==='undefined') return;
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(60,1,0.1,1000);
   const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('three-canvas'),alpha:true,antialias:true});
